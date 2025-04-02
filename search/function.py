@@ -1,4 +1,5 @@
 from .core import CellState, Coord, Direction, MoveAction
+import math
 BOARD_N = 8
 
 # Define the Cell class
@@ -89,14 +90,14 @@ def cal_f_value(g, h):
 # Calculate the heuristic value of a cell
 # Find min value of h from list of goals
 # x, y are the coordinate of cell
-def cal_manhattan_h(goal_list, x, y):
+def cal_euclidean_h(goal_list, x, y):
     i = goal_list[0].__getattribute__("r")
     j = goal_list[0].__getattribute__("c")
     min_h = abs(x - i) + abs(y - j)
     for goal in goal_list:
         i = goal.__getattribute__("r")
         j = goal.__getattribute__("c")
-        h = abs(x - i) + abs(y - j)
+        h = math.sqrt((x - i)*(x - i) + (y - j)*(y - j))
         if(h < min_h):
             min_h = h
     return float(min_h)

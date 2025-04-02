@@ -70,7 +70,7 @@ def search(
 
                         found_dest = True
                         return path
-                new_h = cal_manhattan_h(goal_list, x, y)
+                new_h = cal_euclidean_h(goal_list, x, y)
                 new_g = cal_g_value(cell_details, i, j)
                 new_f = cal_f_value(new_g, new_h)
 
