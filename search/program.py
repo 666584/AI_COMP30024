@@ -38,6 +38,9 @@ def search(
     cell_details = [[Cell() for _ in range(BOARD_N)] for _ in range(BOARD_N)]
 
     # Init open_list and closed_list
+    init_cell = find_init_cell(board, cell_details)
+    if not init_cell: 
+        return None
     open_list = [find_init_cell(board, cell_details)]
     closed_list = [[False for _ in range(BOARD_N)] for _ in range(BOARD_N)]
 
@@ -82,16 +85,3 @@ def search(
 
     if not found_dest:
         return None
-
-    # Here we're returning "hardcoded" actions as an example of the expected
-    # output format. Of course, you should instead return the result of your
-    # search algorithm. Remember: if no solution is possible for a given input,
-    # return `None` instead of a list.
-    return [
-        MoveAction(Coord(0, 5), [Direction.Down]),
-        MoveAction(Coord(1, 5), [Direction.DownLeft]),
-        MoveAction(Coord(3, 3), [Direction.Left]),
-        MoveAction(Coord(3, 2), [Direction.Down, Direction.Right]),
-        MoveAction(Coord(5, 4), [Direction.Down]),
-        MoveAction(Coord(6, 4), [Direction.Down]),
-    ]

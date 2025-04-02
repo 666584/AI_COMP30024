@@ -4,11 +4,11 @@ BOARD_N = 8
 # Define the Cell class
 class Cell:
     def __init__(self):
-        self.parent_i = 0  # Parent cell's x index
-        self.parent_j = 0  # Parent cell's yumn index
-        self.f = float('inf')  # Total cost of the cell (g + h)
-        self.g = float('inf')  # Cost from start to this cell
-        self.h = 0  # Heuristic cost from this cell to destination
+        self.parent_i = 0
+        self.parent_j = 0
+        self.f = float('inf')
+        self.g = float('inf')
+        self.h = 0  
     
 # Find start cell (where red frog is)
 def find_init_cell(board, cell_details):
