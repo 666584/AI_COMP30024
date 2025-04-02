@@ -35,29 +35,75 @@ def search(
     # ... 
 
     """
-    Yurim Cho's Note
+    Note
     # Remember to delete all nodes that was used  
-    # Find next_move from positions_to_move_list that has the lowest value of h
-    # To Do: Think about how to deal with the next_moves that have same lowest value
-    def find_next_move(goal_list, positions_to_move_list):
-        min_h = cal_manhattan_h(goal_list, positions_to_move_list[0])
-        next_move = positions_to_move_list[0]
-        for next_position in positions_to_move_list:
-            h = cal_manhattan_h(goal_list, next_position)
-            # h <= min_h is acceptable
-            if (h < min_h):
-                next_move = next_position
-                min_h = h
-        return next_move
+
     """
-    
-    find_init_cell(board)
-    print("Is next cell jump?")
-    print(is_jump(board, Coord(3, 4)))
-    get_jump_cell(Coord(2,2), Coord(3, 3))
+    print(board)
+
+    cell_details = [[Cell() for _ in range(BOARD_N)] for _ in range(BOARD_N)]
+
+    # Init open_list and closed_list
+    open_list = [find_init_cell(board, cell_details)]
+    closed_list = [[False for _ in range(BOARD_N)] for _ in range(BOARD_N)]
+    print(open_list)
+
+    # Init goal_list
     goal_list = create_goal_list(board)
-    cal_manhattan_h(goal_list, Coord(3, 3))
-    get_reachable_cells(board, Coord(2, 3))
+
+    found_dest = False
+
+    while len(open_list) > 0:
+        curr_cell = find_lowest_f_cell(open_list, cell_details)
+        print("current_cell: ")
+        print(curr_cell)
+        
+        open_list.remove(curr_cell)
+        print("after delete curr_cell from list: ")
+        print(open_list)
+
+        i = curr_cell.__getattribute__("r")
+        j = curr_cell.__getattribute__("c")
+        closed_list[i][j] = True
+        reachable_cells = get_reachable_cells(board, i, j)
+        print("where to move next?")
+        print(reachable_cells)
+
+        for reachable_cell in reachable_cells:
+            x = reachable_cell.__getattribute__("r")
+            y = reachable_cell.__getattribute__("c")
+            if not closed_list[x][y]:
+                for goal in goal_list:
+                    if reachable_cell == goal:
+                        print("Goal: ")
+                        print(reachable_cell)
+                        path = trace_path(cell_details, i, j, goal)
+                        print("cost: ")
+                        print(cell_details[i][j].f)
+                        found_dest = True
+                        return path
+                new_h = cal_manhattan_h(goal_list, x, y)
+                new_g = cal_g_value(cell_details, i, j)
+                new_f = cal_f_value(new_g, new_h)
+                print("Details of reachable cell: ")
+                print(reachable_cell)
+                print(new_f)
+                # If the cell is not in the open list or the new f value is smaller
+                if cell_details[x][y].f == float('inf') or new_f < cell_details[x][y].f:
+                    open_list.append(reachable_cell)
+                    cell_details[x][y].h = new_h
+                    cell_details[x][y].g = new_g
+                    cell_details[x][y].f = new_f
+                    cell_details[x][y].parent_i = i
+                    cell_details[x][y].parent_j = j
+
+                    print("State of open list after append: ")
+                    print(open_list)
+
+                    print("cell details updated: ")
+                    print(cell_details[x][y].f)
+    if not found_dest:
+        return None
 
     # Here we're returning "hardcoded" actions as an example of the expected
     # output format. Of course, you should instead return the result of your
