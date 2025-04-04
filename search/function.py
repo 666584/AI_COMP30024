@@ -113,7 +113,7 @@ def is_cell_in_board(i ,j):
 # x, y are the coordinate of cell
 def get_reachable_cells(board, x, y):
     reachable_cells = []
-    i = x - 1
+    i = x
     j = y - 1
     while i < x + 2:
         while j < y + 2:
