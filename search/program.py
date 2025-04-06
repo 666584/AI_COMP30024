@@ -65,9 +65,9 @@ def search(
             if not closed_list[x][y]:
                 for goal in goal_list:
                     if reachable_cell == goal:
-
-                        path = find_path(cell_details, i, j, goal)
-
+                        cell_details[x][y].parent_i = i
+                        cell_details[x][y].parent_j = j
+                        path = find_path(cell_details, goal, init_cell)
                         found_dest = True
                         return path
                 new_h = cal_euclidean_h(goal_list, x, y)

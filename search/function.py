@@ -57,6 +57,7 @@ def is_lily_pad(board, cell):
 
 # Get position of the cell after red frog jump over blue frog
 # x and y are coordinate of current cell 
+# To-do: frog can jump multiple blue frogs
 def get_jump_cell(x, y, blue_cell):
     i = blue_cell.__getattribute__("r")
     j = blue_cell.__getattribute__("c")
@@ -133,33 +134,73 @@ def get_reachable_cells(board, x, y):
     
     return reachable_cells
 
-def get_direction(curr_x, curr_y, next_x, next_y):
+def get_direction_and_jump(curr_x, curr_y, next_x, next_y):
     direction_x = next_x - curr_x 
     direction_y = next_y - curr_y
     
-    if direction_x != 0: 
-        direction_x = direction_x / abs(direction_x)
-    if direction_y != 0: 
-        direction_y = direction_y / abs(direction_y)
+    is_jump = False
     
-    return Direction(direction_x, direction_y) 
+    if abs(direction_x) > 1:
+        direction_x = direction_x / abs(direction_x)
+        is_jump = True
+    if abs(direction_y) > 1: 
+        direction_y = direction_y / abs(direction_y)
+        is_jump = True
+    
+    return [Direction(direction_x, direction_y), is_jump]
 
-def find_path(cell_details, x, y, goal):
+# Check whether current cell is where red frog is
+def is_init_cell(init_cell, curr_x, curr_y):
+        i = init_cell.__getattribute__("r")
+        j = init_cell.__getattribute__("c")
+        if i == curr_x and j == curr_y:
+            return True
+        return False
+
+def find_path(cell_details, goal, init_cell):
     path_list = []
 
     # Add the last cell to list
-    goal_x = goal.__getattribute__("r")
-    goal_y = goal.__getattribute__("c") 
-
-    path_list.append(MoveAction(Coord(x, y), get_direction(x, y, goal_x, goal_y)))
+    x = goal.__getattribute__("r")
+    y = goal.__getattribute__("c") 
+    
+    # Store data whether previous path was jump
+    was_jump = False
+    # Store list of directions of jump
+    direction_list = []
 
     while not (cell_details[x][y].parent_i == x and cell_details[x][y].parent_j == y):
         temp_x = cell_details[x][y].parent_i
         temp_y = cell_details[x][y].parent_j
-        path_list.append(MoveAction(Coord(temp_x, temp_y), get_direction(temp_x, temp_y, x, y)))
+        result = get_direction_and_jump(temp_x, temp_y, x, y)
+        
+        # Check whether current path is jump
+        is_jump = result[1]
+        is_initial = is_init_cell(init_cell, temp_x, temp_y)
+        
+        if is_initial:
+            if not is_jump:
+                if was_jump:
+                    path_list.append(MoveAction(Coord(x, y), direction_list))
+                path_list.append(MoveAction(Coord(temp_x, temp_y), result[0]))
+            else:
+                direction_list.append(result[0])
+                path_list.append(MoveAction(Coord(temp_x, temp_y), direction_list)) 
+            path_list.reverse()
+            return path_list
+   
+        if not is_jump and not is_initial:
+            if was_jump:
+                path_list.append(MoveAction(Coord(x, y), direction_list))
+            path_list.append(MoveAction(Coord(temp_x, temp_y), result[0]))
+            direction_list = []
+        else:
+            direction_list.append(result[0])    
+        
+        was_jump = result[1]
         x = temp_x
         y = temp_y
-
+    
     path_list.reverse()
 
     return path_list
